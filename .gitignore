@@ -1,0 +1,28 @@
+# Secrets
+.env
+kaggle.json
+
+# Data (Home Credit CSVs are large and shouldn't live in git)
+pipeline/data/raw/
+pipeline/data/interim/
+pipeline/data/processed/
+*.csv
+*.csv.zip
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Models / artifacts
+*.pkl
+*.joblib
+modeling/artifacts/
+
+# OS
+.DS_Store
+Thumbs.db
