@@ -23,6 +23,11 @@ venv/
 *.joblib
 modeling/artifacts/
 
+# MLflow local tracking store (logged models/metrics - regenerable by re-running training)
+mlruns/
+mlflow.db
+mlartifacts/
+
 # OS
 .DS_Store
 Thumbs.db
