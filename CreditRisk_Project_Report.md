@@ -278,21 +278,21 @@ Phase 5 model comparison, `credit-risk-phase5` experiment (`lightgbm` vs. `logis
 
 **Parameters** — confirms what each model was actually trained with: LightGBM's `n_estimators=441` is the manually-corrected true best iteration from Section 3.4's early-stopping bug fix, not a default or the buggy automatic value; `scale_pos_weight=11.387` and `class_weight=balanced` are the two models' respective class-imbalance corrections.
 
-![MLflow Parameters comparison: LightGBM (n_estimators=441, scale_pos_weight=11.387, learning_rate=0.05, num_leaves=31) vs. logistic regression (class_weight=balanced), both trained on 172 raw features](image.png)
+![MLflow Parameters comparison: LightGBM (n_estimators=441, scale_pos_weight=11.387, learning_rate=0.05, num_leaves=31) vs. logistic regression (class_weight=balanced), both trained on 172 raw features](modeling/figures/mlflow_phase5_parameters.png)
 
 **Metrics** — the same AUC/precision/recall/F1 numbers reported in Section 3.4's table, direct from MLflow rather than retyped by hand.
 
-![MLflow Metrics comparison: LightGBM AUC 0.779 vs. logistic regression AUC 0.765, with F1, precision, and recall for both](image-1.png)
+![MLflow Metrics comparison: LightGBM AUC 0.779 vs. logistic regression AUC 0.765, with F1, precision, and recall for both](modeling/figures/mlflow_phase5_metrics.png)
 
 Phase 6 calibration run, same experiment (`lightgbm_calibration`).
 
 **Parameters** — `n_fit_rows` (196,806) and `n_calibration_rows` (49,202) confirm the dedicated calibration slice described in Section 3.5's methodology was actually used, not the full training set or the validation set.
 
-![MLflow Parameters for the lightgbm_calibration run: model=LightGBM, calibration_method=isotonic, n_fit_rows=196806, n_calibration_rows=49202](image-2.png)
+![MLflow Parameters for the lightgbm_calibration run: model=LightGBM, calibration_method=isotonic, n_fit_rows=196806, n_calibration_rows=49202](modeling/figures/mlflow_phase6_calibration_parameters.png)
 
 **Metrics** — the same before/after numbers reported in Section 3.5: AUC essentially unchanged (0.7758 raw vs. 0.7751 calibrated), Brier score improved by more than half (0.165 raw vs. 0.067 calibrated).
 
-![MLflow Metrics for the lightgbm_calibration run: auc_raw=0.7758, auc_calibrated=0.7751, brier_raw=0.1651, brier_calibrated=0.0666](image-3.png)
+![MLflow Metrics for the lightgbm_calibration run: auc_raw=0.7758, auc_calibrated=0.7751, brier_raw=0.1651, brier_calibrated=0.0666](modeling/figures/mlflow_phase6_calibration_metrics.png)
 
 ### Appendix C: Additional Visualizations
 [Any supporting plots not included in the main sections]
