@@ -151,7 +151,19 @@ SHAP (Shapley Additive exPlanations) values are used because they have a princip
 
 Two views are produced: a **global** summary plot (which features matter most across the whole validation set) and **local** explanations (force/waterfall plots for individual predictions, especially declined applicants, since those are the ones that feed the Adverse Action generator in 4.2). Based on public analysis of this dataset, the external credit bureau scores (`EXT_SOURCE_1/2/3`), days employed, and the engineered credit-to-income ratio are reasonable hypotheses for top global features — worth checking your actual SHAP output against this expectation, and against your own EDA hypotheses from 3.2, and explaining any surprises rather than silently accepting them.
 
-[Fill in — insert SHAP summary plot + at least one local force/waterfall plot for a declined applicant]
+**A seam worth being explicit about:** SHAP explains the raw LightGBM model's output (log-odds toward default), not the isotonic-calibrated probability from Section 3.5. Isotonic calibration is a non-parametric step function wrapped *around* the tree model's output — it has no tree structure for `TreeExplainer` to attach to. So these explanations answer "why did the tree model score this applicant as risky"; calibration is a separate step afterward that only rescales the resulting probability, without changing which features drove the decision.
+
+**Global results** (`explain/shap_analysis.py`, full validation set):
+
+![SHAP global feature importance beeswarm plot for the validation set, showing EXT_SOURCE_MEAN as the dominant feature by a wide margin](explain/figures/shap_global_summary.png)
+
+`EXT_SOURCE_MEAN` (the Section 3.3 consensus feature) dominates by a wide margin — mean |SHAP| of 0.52, more than 3x the next feature (`ORGANIZATION_TYPE` at 0.15) — and low values of it (blue) push toward higher predicted risk, exactly the direction expected. This directly confirms the Section 3.2 EDA hypothesis that `EXT_SOURCE_MEAN` would rank as a top feature, and confirms the feature-engineering decision in Section 3.3 was the right call, not just a correlation-table artifact. `CREDIT_ANNUITY_RATIO` and `PREV_APPLICATION_CREDIT_RATIO_MEAN` — both engineered ratios, not raw columns — also rank in the top 10, reinforcing the same pattern from Section 3.3: derived ratios outperform the raw values they're built from.
+
+**Local example** — a single high-risk applicant (SK_ID_CURR 218614, calibrated probability of default 0.30, comfortably inside the top-10% risk band used to select examples for this phase — see the code for why that band, not the real business cutoff, was used):
+
+![SHAP waterfall plot for one high-risk applicant, showing EXT_SOURCE_MEAN contributing +1.41 to the log-odds of default, followed by EXT_SOURCE_3 (+0.27) and CREDIT_ANNUITY_RATIO (+0.20)](explain/figures/shap_local_example.png)
+
+For this applicant, a low `EXT_SOURCE_MEAN` (0.151) alone contributes +1.41 to the log-odds of default — by far the largest single factor — followed by a low `EXT_SOURCE_3` (+0.27) and a high `CREDIT_ANNUITY_RATIO` of 12.5 (+0.20, meaning the loan spans roughly 12.5 annuity payments). The top-3 positive-contribution factors for every applicant in the top 10% of calibrated risk (6,679 applicants) are saved to `explain/output/top_shap_factors.json`, each with the applicant's actual feature value alongside the SHAP contribution — this is the direct input to Phase 8's Adverse Action generator below. (Note on terminology: "top-3 factors" here means the three largest *positive* SHAP values — i.e., the factors that most pushed the prediction toward default — not the three most negative numbers, which would mean the opposite.)
 
 ### 4.2 Adverse Action Notice Generator
 
